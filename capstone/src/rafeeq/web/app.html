@@ -1,0 +1,851 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Rafeeq · رفيق</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap">
+<style>
+/* ---------------------------------------------------------------- palette: lavender-grey page, white cards, violet, indigo and cream (light only) */
+:root{
+  --bg:#efedf6; --surface:#ffffff; --soft:#f5f3fb; --line:#e3dff0;
+  --ink:#27235a; --muted:#7b7899;
+  --violet:#7743db; --indigo:#3b3486; --violet-soft:#ece4fc;
+  --cream:#ffe9b1; --cream-2:#fffaf0;
+  --accent:var(--violet);
+  --ok:#2f6b5e; --ok-bg:#e1eee9; --warn:#7a6320; --warn-bg:#fbf0c9; --bad:#9c4a3c; --bad-bg:#f7e4df;
+  --shadow:0 2px 6px rgba(59,52,134,.04),0 24px 48px -24px rgba(59,52,134,.3);
+  --shadow-sm:0 1px 3px rgba(59,52,134,.05),0 12px 26px -16px rgba(59,52,134,.28);
+  color-scheme:light;
+}
+body[data-role="officer"]{--accent:var(--indigo)}
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:15px/1.6 "IBM Plex Sans Arabic",system-ui,-apple-system,"Segoe UI",Tahoma,"Noto Sans Arabic",sans-serif;
+  -webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;padding:0}
+button:disabled{cursor:not-allowed}
+input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--violet);outline-offset:2px;border-radius:10px}
+h1,h2,h3,h4,p{margin:0}
+svg{display:block}
+
+/* ---------------------------------------------------------------- header */
+.top{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:10px 16px;flex-wrap:wrap;
+  padding:calc(12px + env(safe-area-inset-top,0px)) clamp(16px,3vw,32px) 12px;background:rgba(255,255,255,.95);
+  backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:10px}
+.brand b{display:block;font-size:16px;line-height:1.25}
+.brand small{display:block;font-size:12px;color:var(--muted);line-height:1.25}
+.demo-note{margin:28px auto 0;max-width:720px;padding:10px 22px;border-radius:24px;background:var(--surface);color:var(--muted);font-size:13px;text-align:center}
+.demo-note b{color:var(--indigo)}
+.logo{width:38px;height:38px;border-radius:50%;background:var(--indigo);color:var(--cream);display:grid;place-items:center;font-size:20px;font-weight:700;flex:none}
+.top-right{display:flex;align-items:center;gap:8px}
+.roles{display:flex;padding:4px;border-radius:999px;background:var(--surface);box-shadow:var(--shadow-sm);gap:2px}
+.role{padding:6px 16px;border-radius:999px;font-weight:600;color:var(--muted);display:flex;align-items:center;gap:8px;transition:background .2s,color .2s}
+.role[aria-pressed="true"]{background:var(--accent);color:#fff}
+.role:not([aria-pressed="true"]):hover{color:var(--ink)}
+.demo-tag{font-weight:700;font-size:12.5px;letter-spacing:.08em;padding:4px 12px;border-radius:999px;background:var(--cream);color:var(--indigo)}
+.count{min-width:20px;height:20px;padding:0 6px;border-radius:10px;background:var(--cream);color:var(--ink);font-size:12px;font-weight:700;display:grid;place-items:center}
+.icon-btn{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;color:var(--muted)}
+.icon-btn:hover,.icon-btn[aria-expanded="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow-sm)}
+.settings{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;padding:10px clamp(16px,3vw,32px);background:var(--soft);border-bottom:1px solid var(--line);font-size:13px;color:var(--muted)}
+.settings label{display:flex;align-items:center;gap:8px}
+.settings input{width:150px;padding:5px 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface)}
+.pill{font-size:12.5px;color:var(--muted);padding:3px 12px;border-radius:999px;background:var(--surface)}
+
+main{max-width:1180px;margin:0 auto;padding:clamp(16px,3vw,32px)}
+
+/* ---------------------------------------------------------------- buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 24px;border-radius:999px;font-weight:600;
+  transition:transform .15s,box-shadow .15s,background .15s,opacity .15s}
+.btn.primary{background:linear-gradient(135deg,var(--violet),var(--indigo));color:#fff;box-shadow:0 12px 22px -12px rgba(59,52,134,.8)}
+.btn.primary:hover{transform:translateY(-1px)}
+.btn.ghost{background:var(--surface);box-shadow:inset 0 0 0 1px var(--line)}
+.btn.ghost:hover{box-shadow:inset 0 0 0 1px var(--violet)}
+.btn.plain{color:var(--muted)}
+.btn.plain:hover{color:var(--ink);background:var(--soft)}
+.btn.small{padding:7px 16px;font-size:13.5px}
+.btn:disabled{opacity:.45;transform:none}
+.link{color:var(--violet);font-weight:600;font-size:13.5px}
+.link:hover{text-decoration:underline;text-underline-offset:3px}
+.spacer{flex:1}
+
+/* ---------------------------------------------------------------- landing */
+.hero{text-align:center;padding:clamp(12px,5vw,48px) 0 0}
+.hero h1{font-size:clamp(28px,4.4vw,42px);font-weight:700;line-height:1.2;letter-spacing:-.01em}
+.hero .ar{display:block;margin-top:4px;font-size:clamp(20px,3vw,26px);font-weight:500;color:var(--muted)}
+.hero p{margin-top:12px;color:var(--muted)}
+.permit-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:18px;max-width:1000px;margin:36px auto 0}
+.permit{aspect-ratio:1;padding:8px;border-radius:30px;background:var(--surface);box-shadow:var(--shadow-sm);transition:transform .2s,box-shadow .2s}
+.permit .in{height:100%;border-radius:24px;background:var(--soft);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:12px;text-align:center}
+.permit .ico{width:72px;height:72px;margin-bottom:12px;border-radius:50%;display:grid;place-items:center;color:var(--indigo);
+  background:var(--surface);transition:background .2s,color .2s}
+.permit b{font-size:17px;line-height:1.3}
+.permit .ar{color:var(--muted);font-size:15px}
+.permit:hover{transform:translateY(-4px);box-shadow:var(--shadow)}
+.permit:hover .ico{background:var(--violet);color:#fff}
+.landing-foot{display:flex;justify-content:center;margin-top:32px}
+
+/* ---------------------------------------------------------------- chat */
+.chat-shell{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:20px;height:calc(100dvh - 200px);min-height:520px}
+.chat-col{position:relative;display:flex;flex-direction:column;min-height:0;background:var(--surface);border-radius:30px;overflow:hidden;box-shadow:var(--shadow)}
+.chat-head{display:flex;align-items:center;gap:8px 10px;flex-wrap:wrap;padding:12px 16px;border-bottom:1px solid var(--soft)}
+.ctx{display:flex;align-items:center;gap:8px;padding:4px 14px 4px 4px;border-radius:999px;background:var(--soft);font-weight:600;font-size:14px}
+.ctx .mini{width:28px;height:28px;border-radius:50%;background:var(--surface);color:var(--indigo);display:grid;place-items:center}
+.log{flex:1;min-height:0;overflow-y:auto;padding:18px clamp(12px,2.5vw,24px);scroll-behavior:smooth}
+.to-bottom{position:absolute;right:18px;bottom:100px;width:38px;height:38px;border-radius:50%;background:var(--surface);box-shadow:var(--shadow-sm);display:grid;place-items:center}
+
+.welcome{max-width:600px;margin:0 auto;padding:20px 0 4px;text-align:center}
+.w-av{width:66px;height:66px;margin:0 auto;border-radius:50%;background:linear-gradient(135deg,var(--violet),var(--indigo));color:var(--cream);display:grid;place-items:center;font-size:30px;font-weight:700;box-shadow:0 16px 26px -14px rgba(59,52,134,.8)}
+.welcome h2{margin-top:16px;font-size:clamp(20px,2.6vw,25px);line-height:1.3}
+.welcome .ar{margin-top:2px;color:var(--muted)}
+.choices{display:flex;flex-direction:column;gap:10px;margin-top:24px;text-align:start}
+.choice{display:flex;align-items:center;gap:14px;text-align:start;padding:9px 14px 9px 9px;border-radius:22px;background:var(--soft);transition:background .15s,transform .15s}
+.choice:hover{background:var(--violet-soft);transform:translateY(-1px)}
+.choice .ci{width:40px;height:40px;border-radius:50%;background:var(--surface);color:var(--indigo);display:grid;place-items:center;flex:none}
+.choice .t{flex:1;font-weight:500;line-height:1.4}
+.choice .go{color:var(--muted);flex:none}
+
+.row{display:flex;gap:10px;margin:16px 0;align-items:flex-start;animation:pop .18s ease-out both}
+.row.user{justify-content:flex-end}
+.av{width:32px;height:32px;border-radius:50%;background:var(--indigo);color:var(--cream);display:grid;place-items:center;font-weight:700;font-size:16px;flex:none}
+.av.err{background:var(--bad);color:#fff}
+.stack{display:flex;flex-direction:column;gap:8px;max-width:min(640px,86%);min-width:0}
+.row.user .stack{align-items:flex-end}
+.bubble{padding:11px 16px;border-radius:20px;background:var(--soft);overflow-wrap:anywhere}
+.row.bot .bubble{border-top-left-radius:6px}
+.row.user .bubble{background:var(--violet);color:#fff;border-top-right-radius:6px}
+.bubble.err{background:var(--bad-bg);color:var(--bad)}
+.bubble strong{font-weight:600}
+.bubble p+p,.bubble p+ul,.bubble ul+p,.bubble p+ol,.bubble ol+p{margin-top:8px}
+.bubble ul,.bubble ol{margin:0;padding-inline-start:20px}
+.bubble code{font-family:ui-monospace,Consolas,monospace;font-size:.88em}
+.idpill{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;padding:4px 12px;border-radius:999px;background:var(--soft);color:var(--muted)}
+.event{display:flex;justify-content:center;margin:14px 0}
+.event span{font-size:13px;color:var(--muted);background:var(--soft);padding:4px 14px;border-radius:999px;text-align:center}
+.typing{display:flex;align-items:center;gap:10px;margin:16px 0;color:var(--muted);font-size:13.5px}
+.dots{display:flex;gap:4px;padding:12px 14px;border-radius:20px;background:var(--soft)}
+.dots i{width:7px;height:7px;border-radius:50%;background:var(--muted);animation:blink 1.1s infinite ease-in-out}
+.dots i:nth-child(2){animation-delay:.15s}.dots i:nth-child(3){animation-delay:.3s}
+@keyframes blink{0%,80%,100%{opacity:.25}40%{opacity:1}}
+@keyframes pop{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+/* cards: a white frame around a soft inner panel, actions underneath */
+.card{background:var(--surface);border-radius:26px;padding:8px;box-shadow:var(--shadow-sm);border:1px solid var(--soft)}
+.card .in{background:var(--soft);border-radius:20px;padding:14px 18px}
+.card.decided{box-shadow:none}
+.card-h{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.07em}
+.card-t{margin-top:2px;font-weight:600;font-size:16px;line-height:1.4}
+.card-t+.kv{margin-top:10px}
+.kv{display:flex;justify-content:space-between;gap:14px;padding:7px 0;border-top:1px dashed var(--line);font-size:14px}
+.kv span{color:var(--muted);flex:none}
+.kv b{font-weight:500;text-align:end;overflow-wrap:anywhere;white-space:pre-wrap}
+.kv.big b{font-size:18px;font-weight:700}
+.card-f{display:flex;justify-content:center;align-items:center;gap:8px;padding:12px 6px 6px}
+.badge{display:inline-flex;align-items:center;gap:7px;padding:3px 12px;border-radius:999px;font-size:12.5px;font-weight:600;background:var(--soft);color:var(--muted)}
+.badge::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.badge.warn{background:var(--warn-bg);color:var(--warn)}
+.badge.ok{background:var(--ok-bg);color:var(--ok)}
+.badge.bad{background:var(--bad-bg);color:var(--bad)}
+.vcard h4{font-size:15.5px}
+.vcard .hint{color:var(--muted);font-size:13px;margin-top:2px}
+.vgrid{display:grid;grid-template-columns:1fr 1fr 1.3fr;gap:10px;margin-top:12px}
+.field label{display:block;font-size:12.5px;color:var(--muted);margin-bottom:4px}
+.field input{width:100%;padding:9px 14px;border-radius:14px;border:1px solid var(--line);background:var(--surface)}
+.vrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:12px 6px 6px}
+.verr{margin-top:10px;color:var(--bad);font-size:13.5px}
+
+.suggest{display:flex;gap:8px;flex-wrap:wrap;padding:0 clamp(12px,2.5vw,24px)}
+.suggest:not(:empty){padding-top:6px}
+.chip{padding:7px 15px;border-radius:999px;background:var(--soft);font-size:14px;font-weight:500;text-align:start}
+.chip:hover{background:var(--violet-soft)}
+.composer{display:flex;gap:8px;align-items:flex-end;margin:10px clamp(12px,2.5vw,20px) 14px;padding:5px 5px 5px 18px;border-radius:28px;background:var(--soft)}
+.composer:focus-within{box-shadow:inset 0 0 0 2px var(--violet-soft)}
+.composer textarea{flex:1;resize:none;max-height:140px;padding:9px 0;border:0;background:transparent;line-height:1.5;outline:none}
+.send{height:42px}
+
+/* side panel */
+.side{display:flex;flex-direction:column;min-height:0;background:var(--surface);border-radius:30px;padding:18px;overflow:hidden;box-shadow:var(--shadow)}
+.side-h{display:flex;justify-content:space-between;align-items:center}
+.side h3{font-size:16px}
+.req-toggle{display:none}
+.reqs{flex:1;min-height:0;overflow-y:auto;margin-top:12px;display:flex;flex-direction:column;gap:10px}
+.empty{padding:18px;border-radius:20px;background:var(--soft);color:var(--muted);font-size:14px;text-align:center}
+.req{padding:12px 14px;border-radius:20px;background:var(--soft);display:flex;flex-direction:column;align-items:flex-start;gap:8px}
+.req b{font-size:14px;font-weight:600;line-height:1.35;overflow-wrap:anywhere}
+.res{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:13px;color:var(--muted)}
+.res strong{color:var(--ink);font-weight:600}
+
+/* ---------------------------------------------------------------- officer */
+.off-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:18px;margin:6px 0 4px}
+.off-head h1{font-size:clamp(26px,3.6vw,36px);line-height:1.2}
+.off-head h1 .ar{display:inline-block;margin-left:10px;font-size:20px;font-weight:500;color:var(--muted)}
+.off-head p{margin-top:6px;color:var(--muted)}
+.figures{display:flex;flex-wrap:wrap;gap:12px}
+.fig{min-width:118px;padding:6px;border-radius:22px;background:var(--surface);box-shadow:var(--shadow-sm)}
+.fig .in{background:var(--soft);border-radius:17px;padding:8px 14px}
+.fig b{display:block;font-size:21px;line-height:1.3}
+.fig span{font-size:12.5px;color:var(--muted)}
+.off-grid{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:20px;margin-top:24px}
+.panel{background:var(--surface);border-radius:30px;padding:20px;box-shadow:var(--shadow)}
+.panel+.panel{margin-top:20px}
+.panel h2{font-size:17px;display:flex;align-items:center;gap:10px}
+.refunds{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin-top:14px}
+.refunds .empty{grid-column:1/-1}
+.refund{border-radius:26px;padding:8px;background:var(--surface);border:1px solid var(--soft);box-shadow:var(--shadow-sm)}
+.refund .in{background:var(--soft);border-radius:20px;padding:18px 14px;text-align:center}
+.refund .rid{font-size:12.5px;color:var(--muted);font-weight:600;letter-spacing:.03em}
+.amount{margin-top:6px;font-size:32px;font-weight:700;line-height:1.1}
+.amount small{font-size:14px;color:var(--muted);font-weight:600;margin-inline-start:4px}
+.refund .why{margin-top:6px;font-size:13.5px;color:var(--muted)}
+.actions{display:flex;justify-content:center;gap:6px;padding:12px 4px 4px}
+.list{list-style:none;margin:12px 0 0;padding:0;display:flex;flex-direction:column;gap:8px}
+.list li{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 14px;border-radius:18px;background:var(--soft);font-size:14px}
+.list .sm{display:block;color:var(--muted);font-size:13px;overflow-wrap:anywhere}
+.list .clip{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.list li.none{justify-content:center;color:var(--muted)}
+
+.toast{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);opacity:0;pointer-events:none;
+  background:var(--ink);color:var(--bg);padding:11px 20px;border-radius:999px;max-width:min(520px,92vw);z-index:40;font-size:14px;transition:opacity .2s,transform .2s;box-shadow:var(--shadow)}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+@media (max-width:900px){
+  .chat-shell{grid-template-columns:minmax(0,1fr);height:auto;min-height:0}
+  .chat-col{height:calc(100dvh - 190px);min-height:480px}
+  .side{order:-1;padding:12px 18px}
+  .reqs{display:none}
+  .side.open .reqs{display:flex;max-height:42dvh}
+  .req-toggle{display:inline-flex}
+  .off-grid{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:560px){
+  .permit-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+  .permit .ico{width:64px;height:64px}
+  .suggest{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
+  .suggest .chip{flex:none;max-width:80vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .vgrid{grid-template-columns:1fr}
+  .stack{max-width:92%}
+  .role{padding:6px 12px}
+  .brand small{display:none}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body data-role="applicant">
+
+<header class="top">
+  <div class="brand">
+    <div class="logo" aria-hidden="true">ر</div>
+    <div><b>Rafeeq · رفيق</b><small>Madar Municipal Services’ permit assistant</small></div>
+  </div>
+  <div class="top-right">
+    <span class="demo-tag" title="One person can play both roles on this page">DEMO</span>
+    <div class="roles" role="group" aria-label="Choose who you are in the demo">
+      <button class="role" id="btnApplicant" aria-pressed="true">Applicant</button>
+      <button class="role" id="btnOfficer" aria-pressed="false">Officer<span class="count" id="cntOfficer" hidden>0</span></button>
+    </div>
+    <button class="icon-btn" id="settingsBtn" aria-label="Settings" title="Keys and service status" aria-expanded="false">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+    </button>
+  </div>
+</header>
+<div class="settings" id="settings" hidden>
+  <label>Applicant API key <input id="apiKey" autocomplete="off"></label>
+  <label>Officer key <input id="officerKey" autocomplete="off"></label>
+  <span class="pill" id="health">checking the service…</span>
+  <a class="link" href="/docs" target="_blank" rel="noopener">API docs ↗</a>
+</div>
+
+<main>
+  <!-- ============================================================ APPLICANT -->
+  <section id="viewApplicant" aria-label="Applicant">
+    <div id="landing">
+      <div class="hero">
+        <h1>Which permit do you need?<span class="ar" dir="rtl" lang="ar">أي تصريح تحتاج؟</span></h1>
+        <p>Rafeeq (<bdi lang="ar">رفيق</bdi>) is the permit assistant of Madar Municipal Services. Ask in Arabic or English;
+          nothing changes until you confirm.</p>
+      </div>
+      <div class="permit-grid" id="permitGrid"></div>
+      <div class="landing-foot"><button class="btn ghost" id="askAny">Not sure? Ask a question</button></div>
+    </div>
+
+    <div id="chatWrap" hidden>
+      <div class="chat-shell">
+        <div class="chat-col">
+          <div class="chat-head">
+            <div class="ctx" id="ctx"></div>
+            <button class="link" id="changePermit">Change</button>
+            <span class="spacer"></span>
+            <button class="btn ghost small" id="verifyBtn">Verify identity</button>
+            <button class="btn ghost small" id="newConv">New chat</button>
+          </div>
+          <div class="log" id="log" role="log" aria-live="polite" aria-label="Conversation with Rafeeq"></div>
+          <button class="to-bottom" id="toBottom" aria-label="Jump to the latest message" hidden>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M6 13l6 6 6-6"/></svg>
+          </button>
+          <div class="suggest" id="suggest"></div>
+          <div class="composer">
+            <textarea id="input" rows="1" dir="auto" placeholder="Type your message…  اكتب رسالتك" aria-label="Your message"></textarea>
+            <button class="btn primary send" id="send">Send</button>
+          </div>
+        </div>
+        <aside class="side" id="side" aria-label="Your requests">
+          <div class="side-h">
+            <h3>Your requests</h3>
+            <button class="btn ghost small req-toggle" id="reqToggle" aria-expanded="false">Show</button>
+          </div>
+          <div class="reqs" id="reqs"></div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ OFFICER -->
+  <section id="viewOfficer" aria-label="Finance officer" hidden>
+    <div class="off-head">
+      <div>
+        <h1>Finance approvals <span class="ar" dir="rtl" lang="ar">اعتماد المالية</span></h1>
+        <p>Refunds above 1,000 SAR wait for your approval. No personal details are shown.</p>
+      </div>
+      <div class="figures" id="figures"></div>
+    </div>
+    <div class="off-grid">
+      <div class="panel">
+        <h2>Waiting for approval <span class="badge warn" id="qCount">0</span></h2>
+        <div class="refunds" id="queue"></div>
+      </div>
+      <div>
+        <div class="panel">
+          <h2>Recent decisions</h2>
+          <ul class="list" id="decided"></ul>
+        </div>
+        <div class="panel">
+          <h2>Escalations</h2>
+          <ul class="list" id="escs"></ul>
+        </div>
+      </div>
+    </div>
+  </section>
+  <p class="demo-note"><b>Demo only.</b> Madar Municipal Services is fictional, and all data here is synthetic.</p>
+</main>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(() => {
+'use strict';
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const store = {
+  get(k, d) { try { return localStorage.getItem(k) ?? d; } catch { return d; } },
+  set(k, v) { try { localStorage.setItem(k, v); } catch {} },
+};
+const now = () => new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+const sar = (n) => Number(n).toLocaleString('en-US') + ' SAR';
+const newSession = () => 'web-' + Math.random().toString(36).slice(2, 8);
+const ID_MARK = '[Identity] ';
+
+/* ---------------------------------------------------------------- icons */
+const svg = (d, s = 26) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+const ICON = {
+  BLD: '<path d="M4 21V5l8-2v18M12 21V9l8 2v10M3 21h18M8 8h.01M8 12h.01M8 16h.01M16 14h.01M16 18h.01"/>',
+  REN: '<path d="M14.7 6.3a4 4 0 0 0-5.4 5.1L3 17.7 6.3 21l6.3-6.3a4 4 0 0 0 5.1-5.4l-2.5 2.5-2.3-.6-.6-2.3z"/>',
+  SGN: '<rect x="3" y="4" width="18" height="10" rx="1.5"/><path d="M12 14v7M8 21h8M7 8h10M7 11h6"/>',
+  FTR: '<path d="M3 16V7a1 1 0 0 1 1-1h10v10M14 9h4l3 3v4h-3M3 16h2M9.3 16h6.4"/><circle cx="7.5" cy="17.5" r="1.8"/><circle cx="17.5" cy="17.5" r="1.8"/>',
+  EVT: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4M8 14h3"/>',
+  any: '<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/>',
+  lock: '<rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>',
+  go: '<path d="M9 6l6 6-6 6"/>',
+};
+const LOCK = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>';
+
+/* ---------------------------------------------------------------- data: the synthetic Madar applicants and starters */
+const DEMO = {
+  fahad: { name: 'Fahad', permit: 'BLD-20417', id4: '7730', mobile: '0555017730' },
+  huda: { name: 'Huda', permit: 'BLD-20981', id4: '1196', mobile: '0548841196' },
+  sara: { name: 'Sara', permit: 'REN-10482', id4: '4821', mobile: '0501234821' },
+  omar: { name: 'Omar', permit: 'SGN-40220', id4: '0093', mobile: '0540410093' },
+  khalid: { name: 'Khalid', permit: 'SGN-40388', id4: '2277', mobile: '0505502277' },
+  noura: { name: 'Noura', permit: 'FTR-30311', id4: '6654', mobile: '0532236654' },
+  layla: { name: 'Layla', permit: 'EVT-50077', id4: '8012', mobile: '0568988012' },
+};
+const q = (kind, text, note, needsId = false, demo = null) => ({ kind, text, note, needsId, demo });
+const PERMITS = [
+  { id: 'BLD', en: 'Building', ar: 'بناء', desc: 'New buildings and extensions', demo: 'fahad', starters: [
+    q('policy', 'What is the building permit fee for a 420 m² villa?', 'Computed with the fee tool (POL-02)'),
+    q('confirm', 'My building application is overdue. Please escalate it.', 'Identity check, then you confirm', true, 'fahad'),
+    q('confirm', 'Please move my foundation inspection INS-9001 to Thursday 5 November, after 12:00.', 'Identity check, then you confirm', true, 'huda') ] },
+  { id: 'REN', en: 'Renovation', ar: 'ترميم', desc: 'Changes to an existing building', demo: 'sara', starters: [
+    q('id', 'What is the status of my renovation application?', 'Rafeeq looks it up after verifying you', true, 'sara'),
+    q('policy', 'I will replace load-bearing walls over 35 m². What is the renovation fee?', 'Structural works (POL-02)'),
+    q('policy', 'If I withdraw before anyone reviews it, do I get my money back?', 'Refund rules (POL-04, POL-06)') ] },
+  { id: 'SGN', en: 'Signage', ar: 'لوحات', desc: 'Shop signs and lit boards', demo: 'omar', starters: [
+    q('policy', 'What is the fee for an illuminated 3 m² sign?', 'Computed with the fee tool (POL-02)'),
+    q('finance', 'My sign application was rejected. Can I get a refund?', 'Above 1,000 SAR a finance officer approves', true, 'omar'),
+    q('confirm', 'I was charged twice for my sign permit. Please refund the second payment.', 'Small refund, paid automatically', true, 'khalid') ] },
+  { id: 'FTR', en: 'Food truck', ar: 'عربة طعام', desc: 'Mobile kitchens and trading zones', demo: 'noura', starters: [
+    q('confirm', 'Please book the health inspection for my food truck on Thursday 5 November, earliest slot.', 'Identity check, then you confirm the slot', true, 'noura'),
+    q('policy', 'Which food truck zone is near the university, and can I operate there on weekdays?', 'Zones (POL-09)'),
+    q('policy', 'What is the fine if a food truck operates outside a designated zone?', 'Fines (POL-07)') ] },
+  { id: 'EVT', en: 'Event', ar: 'فعالية', desc: 'Public gatherings and exhibitions', demo: 'layla', starters: [
+    q('policy', 'How much is the permit for a 5-day exhibition?', 'Computed with the fee tool (POL-02)'),
+    q('id', 'What do I still need for my event application?', 'Rafeeq looks it up after verifying you', true, 'layla'),
+    q('policy', 'Can we still apply for a charity run on 8 November?', 'Application deadlines (POL-01)') ] },
+];
+const ANY = { id: 'any', en: 'Any permit', starters: [
+  q('policy', 'What is the fee for an illuminated 3 m² sign?', 'Computed with the fee tool (POL-02)'),
+  q('confirm', 'Please book the health inspection for my food truck on Thursday 5 November, earliest slot.', 'Identity check, then you confirm', true, 'noura'),
+  q('id', 'ما حالة طلب الترميم الخاص بي؟', 'Rafeeq answers in Arabic', true, 'sara'),
+  q('finance', 'My sign application was rejected. Can I get a refund?', 'Above 1,000 SAR a finance officer approves', true, 'omar') ] };
+const STATUS = {
+  awaiting: ['Waiting for your confirmation', 'warn'], done: ['Done ✓', 'ok'], cancelled: ['Cancelled', ''],
+  blocked: ['Blocked by data policy', 'bad'], failed: ['Could not be completed', 'bad'],
+  finance_pending: ['Waiting for a finance officer', 'warn'], finance_approved: ['Refund approved ✓', 'ok'],
+  finance_rejected: ['Refund declined', ''],
+};
+const MESSAGES = {
+  401: 'The key was not accepted. Open Settings (the gear) and check it.',
+  404: 'That action is not part of this conversation.',
+  409: 'This action was already decided.',
+  429: 'This conversation has used its budget. Start a new conversation.',
+  503: 'The language model is busy right now (free models get rate-limited). Please try again in a minute.',
+};
+
+/* ---------------------------------------------------------------- state */
+const S = {
+  view: 'applicant', stage: 'landing', permit: null, session: store.get('rafeeq.session', ''),
+  msgs: [], actions: [], verify: null, busy: false, typing: '', suggest: [], stick: true,
+  keys: { api: store.get('rafeeq.key', 'dev-key-1'), officer: store.get('rafeeq.officerKey', 'officer-key-1') },
+  off: { queue: [], decided: [], esc: [], error: '' },
+};
+const permitById = (id) => PERMITS.find((p) => p.id === id) || ANY;
+
+/* ---------------------------------------------------------------- API */
+async function api(path, { method = 'GET', body, role = 'applicant' } = {}) {
+  const headers = { 'Content-Type': 'application/json' };
+  if (role === 'officer') headers['X-Officer-Key'] = S.keys.officer; else headers['X-API-Key'] = S.keys.api;
+  const res = await fetch(path, { method, headers, body: body ? JSON.stringify(body) : undefined });
+  if (!res.ok) {
+    let detail = res.statusText;
+    try { detail = (await res.json()).detail || detail; } catch {}
+    const e = new Error(MESSAGES[res.status] || (typeof detail === 'string' ? detail : JSON.stringify(detail)));
+    e.status = res.status;
+    throw e;
+  }
+  return res.json();
+}
+
+/* ---------------------------------------------------------------- small helpers */
+let toastT;
+function toast(t) { const el = $('#toast'); el.textContent = t; el.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove('show'), 4200); }
+function inline(t) { return t.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/`(.+?)`/g, '<code>$1</code>'); }
+function md(s) {  // a small, safe Markdown subset: paragraphs, bold, code, bullet and numbered lists
+  let out = '', list = '';
+  for (const ln of esc(s).split('\n')) {
+    const b = ln.match(/^\s*[-*•]\s+(.*)$/), n = ln.match(/^\s*\d+[.)]\s+(.*)$/);
+    const kind = b ? 'ul' : n ? 'ol' : '';
+    if (list && kind !== list) { out += `</${list}>`; list = ''; }
+    if (kind && !list) { out += `<${kind}>`; list = kind; }
+    if (kind) out += '<li>' + inline((b || n)[1]) + '</li>';
+    else if (ln.trim()) out += '<p>' + inline(ln) + '</p>';
+  }
+  return out + (list ? `</${list}>` : '');
+}
+function splitIdentity(text) {  // "question\n\n[Identity] Permit X · national ID ends 1234 · registered mobile 05…"
+  const i = text.indexOf(ID_MARK);
+  if (i < 0) return { question: text, id: null };
+  const m = text.slice(i).match(/Permit (\S+) · national ID ends (\d{4}) · registered mobile (\S+)/);
+  return { question: text.slice(0, i).trim(), id: m ? { permit: m[1], id4: m[2], mobile: m[3] } : {} };
+}
+function asksForIdentity(reply) {
+  return /(last\s*(4|four)|national id|registered mobile|verify (your|the) identity|identity verification|آخر\s*(4|أربع)|رقم الهوية|الجوال المسجل|التحقق من الهوية)/i.test(reply || '');
+}
+function workingLabel(t) {
+  const s = t.toLowerCase();
+  if (t.includes(ID_MARK)) return 'Verifying your identity and looking up the application…';
+  if (/fee|cost|how much|price|رسوم|كم/.test(s)) return 'Checking the fee schedule…';
+  if (/book|inspection|slot|reschedul|move my|حجز|فحص/.test(s)) return 'Looking for free inspection slots…';
+  if (/refund|money back|charged twice|استرداد/.test(s)) return 'Checking the refund rules…';
+  if (/escalat|overdue|تصعيد/.test(s)) return 'Checking the service levels…';
+  if (/status|still need|حالة/.test(s)) return 'Looking up the application…';
+  if (/^\[app event\]|confirmed|cancelled/.test(s)) return 'Finishing up…';
+  return 'Reading the policies…';
+}
+
+/* ---------------------------------------------------------------- view and routing */
+function setView(v, fromHash) {
+  S.view = v;
+  document.body.dataset.role = v;
+  $('#viewApplicant').hidden = v !== 'applicant';
+  $('#viewOfficer').hidden = v !== 'officer';
+  $('#btnApplicant').setAttribute('aria-pressed', v === 'applicant');
+  $('#btnOfficer').setAttribute('aria-pressed', v === 'officer');
+  if (!fromHash) { try { history.replaceState(null, '', '#' + v); } catch {} }
+  window.scrollTo(0, 0);
+  if (v === 'officer') refreshOfficer(); else if (S.stage === 'chat') renderLog();
+}
+function renderCount() {
+  const n = S.off.queue.length, c = $('#cntOfficer');
+  c.hidden = n === 0 || !!S.off.error; c.textContent = n;
+  document.title = (n && !S.off.error ? `(${n}) ` : '') + 'Rafeeq · رفيق';
+}
+
+/* ---------------------------------------------------------------- landing */
+function renderLanding() {
+  $('#permitGrid').innerHTML = PERMITS.map((p) => `<button class="permit" data-act="permit" data-id="${p.id}" title="${esc(p.desc)}"><span class="in">
+    <span class="ico">${svg(ICON[p.id], 32)}</span><b>${esc(p.en)}</b><span class="ar" dir="rtl" lang="ar">${esc(p.ar)}</span></span></button>`).join('');
+}
+function startChat(permitId) {
+  S.permit = permitById(permitId);
+  S.session = newSession();
+  store.set('rafeeq.session', S.session);
+  store.set('rafeeq.permit.' + S.session, S.permit.id);
+  S.msgs = []; S.actions = []; S.verify = null; S.suggest = []; S.stick = true;
+  showChat();
+  setTimeout(() => $('#input').focus(), 50);
+}
+function showChat() {
+  S.stage = 'chat';
+  $('#landing').hidden = true; $('#chatWrap').hidden = false;
+  const p = S.permit;
+  $('#ctx').innerHTML = `<span class="mini">${svg(ICON[p.id] || ICON.any, 15)}</span>${p.id === 'any' ? 'Any permit' : esc(p.en) + ' permit'}`;
+  $('#side').classList.remove('open');
+  renderLog(); updateComposer();
+}
+function showLanding() {
+  S.stage = 'landing'; S.verify = null;
+  $('#landing').hidden = false; $('#chatWrap').hidden = true; window.scrollTo(0, 0);
+}
+
+/* ---------------------------------------------------------------- chat rendering */
+function welcomeHTML() {
+  const p = S.permit;
+  const cards = p.starters.map((s, i) => `<button class="choice" data-act="starter" data-i="${i}" title="${esc(s.note)}">
+    <span class="ci">${svg(s.needsId ? ICON.lock : ICON.any, 18)}</span><span class="t" dir="auto">${esc(s.text)}</span><span class="go">${svg(ICON.go, 18)}</span></button>`).join('');
+  return `<div class="welcome"><div class="w-av" aria-hidden="true">ر</div>
+    <h2>How can I help with your ${p.id === 'any' ? '' : esc(p.en.toLowerCase()) + ' '}permit?</h2>
+    <p class="ar" dir="rtl" lang="ar">كيف يمكنني مساعدتك؟</p>
+    <div class="choices">${cards}</div></div>`;
+}
+function confirmHTML(a) {
+  const decided = a.status !== 'awaiting', st = STATUS[a.status] || [a.status, ''];
+  const rows = (a.details || []).map(([k, v]) => `<div class="kv ${['Refund amount', 'When', 'Overdue'].includes(k) ? 'big' : ''}"><span>${esc(k)}</span><b dir="auto">${esc(v)}</b></div>`).join('');
+  const foot = decided
+    ? `<div class="card-f"><span class="badge ${st[1]}">${esc(st[0])}</span></div>`
+    : `<div class="card-f"><button class="btn primary" data-act="confirm" data-a="${a.id}">Confirm</button>
+       <button class="btn plain" data-act="cancel" data-a="${a.id}">Cancel</button></div>`;
+  return `<div class="card ${decided ? 'decided' : ''}"><div class="in"><div class="card-h">${decided ? 'Decision recorded' : 'Please confirm'}</div>
+    <div class="card-t">${esc(a.action)}</div>${rows}</div>${foot}</div>`;
+}
+function verifyHTML() {
+  const v = S.verify, d = DEMO[v.demo] || DEMO.noura;
+  return `<div class="row bot"><div class="av" aria-hidden="true">ر</div><div class="stack" style="width:100%"><div class="card"><div class="in vcard">
+    <h4>Verify your identity</h4>
+    <p class="hint">Used only to check who you are. Never stored.</p>
+    <div class="vgrid">
+      <div class="field"><label for="vPermit">Permit number</label><input id="vPermit" data-vf="permit" value="${esc(v.vals.permit)}" placeholder="SGN-40220" autocomplete="off"></div>
+      <div class="field"><label for="vId">Last 4 digits of national ID</label><input id="vId" data-vf="id4" inputmode="numeric" maxlength="4" value="${esc(v.vals.id4)}" autocomplete="off"></div>
+      <div class="field"><label for="vMobile">Registered mobile</label><input id="vMobile" data-vf="mobile" inputmode="tel" value="${esc(v.vals.mobile)}" placeholder="05XXXXXXXX" autocomplete="off"></div>
+    </div>
+    ${v.error ? `<p class="verr">${esc(v.error)}</p>` : ''}</div>
+    <div class="vrow"><button class="btn primary small" data-act="verify">Send</button>
+      <button class="btn ghost small" data-act="demofill">Fill demo details for ${esc(d.name)}</button>
+      <span class="spacer"></span><button class="btn plain small" data-act="closeverify">Not now</button></div>
+  </div></div></div>`;
+}
+function msgHTML(m) {
+  if (m.role === 'event') return `<div class="event ${m.finance ? 'finance' : ''}"><span>${esc(m.text)}</span></div>`;
+  if (m.role === 'error') return `<div class="row"><div class="av err">!</div><div class="stack"><div class="bubble err">${esc(m.text)}</div></div></div>`;
+  if (m.role === 'user') {
+    const { question, id } = splitIdentity(m.text);
+    const pill = id ? `<span class="idpill">${LOCK}Identity details sent${id.permit ? ' · ' + esc(id.permit) : ''}</span>` : '';
+    return `<div class="row user"><div class="stack">${question ? `<div class="bubble" dir="auto">${md(question)}</div>` : ''}${pill}</div></div>`;
+  }
+  const cards = (m.confirmations || []).map((id) => S.actions.find((a) => a.id === id)).filter(Boolean).map(confirmHTML).join('');
+  return `<div class="row bot"><div class="av" aria-hidden="true">ر</div><div class="stack">
+    ${m.text ? `<div class="bubble" dir="auto">${md(m.text)}</div>` : ''}${cards}</div></div>`;
+}
+function typingHTML() {
+  return `<div class="typing"><div class="av" aria-hidden="true">ر</div><div class="dots" aria-hidden="true"><i></i><i></i><i></i></div><span>${esc(S.typing)}</span></div>`;
+}
+function renderLog() {
+  const log = $('#log');
+  const pinned = log.scrollHeight - log.scrollTop - log.clientHeight < 200;
+  const body = S.msgs.map(msgHTML).join('') + (S.verify ? verifyHTML() : '') + (S.typing ? typingHTML() : '');
+  log.innerHTML = body || welcomeHTML();
+  if (body && (pinned || S.stick)) { log.style.scrollBehavior = 'auto'; log.scrollTop = log.scrollHeight; log.style.scrollBehavior = ''; }
+  S.stick = false;
+  onLogScroll(); renderSuggest(); renderReqs();
+}
+function renderSuggest() {
+  $('#suggest').innerHTML = (!S.busy && !S.verify && S.suggest.length)
+    ? S.suggest.map((t, i) => `<button class="chip" data-act="chip" data-i="${i}" dir="auto">${esc(t)}</button>`).join('') : '';
+}
+function resultLine(r) {
+  if (!r || typeof r !== 'object') return [];
+  if (r.error) return [['', r.error]];
+  const L = { inspection_id: 'Inspection', slot: 'Slot', new_slot: 'New slot', refund_id: 'Refund', amount_sar: 'Amount', escalation_id: 'Escalation', message_id: 'Email' };
+  return Object.keys(L).filter((k) => r[k] != null).map((k) => [L[k], k === 'amount_sar' ? sar(r[k]) : String(r[k])]);
+}
+function renderReqs() {
+  const list = S.actions.slice().reverse();
+  $('#reqToggle').textContent = $('#side').classList.contains('open') ? 'Hide' : 'Show' + (list.length ? ` (${list.length})` : '');
+  if (!list.length) { $('#reqs').innerHTML = '<div class="empty">Nothing yet</div>'; return; }
+  $('#reqs').innerHTML = list.map((a) => {
+    const st = STATUS[a.status] || [a.status, ''];
+    const res = resultLine(a.result);
+    const resHTML = res.length && a.status !== 'awaiting' ? `<div class="res">${res.map(([k, v]) => `<span>${esc(k)} <strong>${esc(v)}</strong></span>`).join('')}</div>` : '';
+    const go = a.status === 'finance_pending' ? '<button class="link" data-act="goofficer">Open in Officer view</button>' : '';
+    return `<div class="req"><b>${esc(a.action)}</b><span class="badge ${st[1]}">${esc(st[0])}</span>${resHTML}${go}</div>`;
+  }).join('');
+}
+function updateComposer() { $('#send').disabled = S.busy; $('#verifyBtn').disabled = S.busy; renderSuggest(); }
+function onLogScroll() { const l = $('#log'); $('#toBottom').hidden = !(S.msgs.length && l.scrollHeight - l.scrollTop - l.clientHeight > 260); }
+
+/* ---------------------------------------------------------------- chat engine */
+function upsertActions(list) {
+  for (const a of list) {
+    const i = S.actions.findIndex((x) => x.id === a.id);
+    if (i >= 0) S.actions[i] = { ...S.actions[i], ...a }; else S.actions.push(a);
+  }
+}
+function suggestions() {
+  const asked = new Set(S.msgs.filter((m) => m.role === 'user').map((m) => splitIdentity(m.text).question));
+  const list = S.permit.starters.filter((s) => !asked.has(s.text)).map((s) => s.text).slice(0, 2);
+  if (S.msgs.some((m) => m.role === 'user' && m.text.includes(ID_MARK)) && !asked.has('Email me a short summary of this.')) list.push('Email me a short summary of this.');
+  return list;
+}
+let typingTimer;
+function startTyping(text) {
+  S.typing = workingLabel(text);
+  clearTimeout(typingTimer);
+  typingTimer = setTimeout(() => { if (S.typing) { S.typing += ' (free models can take a little while)'; renderLog(); } }, 9000);
+}
+function showTurn(out) {
+  upsertActions(out.confirmations || []);
+  const ids = (out.confirmations || []).map((c) => c.id);
+  if (out.reply || ids.length) S.msgs.push({ role: 'bot', text: out.reply || '', tools: [...new Set(out.tools || [])], confirmations: ids, time: now() });
+  const verified = S.msgs.some((m) => m.role === 'user' && m.text.includes(ID_MARK));
+  if (!ids.length && asksForIdentity(out.reply) && !verified) openVerify('', false);
+  S.suggest = suggestions();
+}
+async function send(text) {
+  text = (text || '').trim();
+  if (!text) return;
+  if (S.busy) { toast('Rafeeq is still replying. Try again in a moment.'); return; }
+  S.busy = true; S.verify = null; S.suggest = [];
+  S.msgs = S.msgs.filter((m) => !m.pending);
+  S.msgs.push({ role: 'user', text, time: now() });
+  startTyping(text); S.stick = true; updateComposer(); renderLog();
+  try {
+    showTurn(await api('/v1/chat', { method: 'POST', body: { session_id: S.session, message: text } }));
+  } catch (e) {
+    S.msgs.push({ role: 'error', text: e.message });
+  } finally {
+    S.typing = ''; S.busy = false; S.stick = true; updateComposer(); renderLog(); refreshActions();
+  }
+}
+async function decide(id, yes) {
+  const a = S.actions.find((x) => x.id === id);
+  if (!a) return;
+  if (a.status !== 'awaiting') { toast(MESSAGES[409]); return; }
+  if (S.busy) { toast('Rafeeq is still replying. Try again in a moment.'); return; }
+  S.busy = true; S.typing = yes ? 'Carrying it out and reporting back…' : 'Cancelling…'; S.stick = true; updateComposer(); renderLog();
+  try {
+    const out = await api(`/v1/chat/${encodeURIComponent(S.session)}/confirmations/${id}`, { method: 'POST', body: { confirm: yes } });
+    upsertActions([out.action]);
+    S.msgs.push({ role: 'event', text: `${yes ? 'You confirmed' : 'You cancelled'}: ${out.action.action}` });
+    showTurn(out);
+  } catch (e) {
+    S.msgs.push({ role: 'error', text: e.message });
+  } finally {
+    S.typing = ''; S.busy = false; S.stick = true; updateComposer(); renderLog(); refreshActions();
+  }
+}
+function openVerify(question, scroll = true, demo = null) {
+  const p = S.permit, key = demo || p.demo || 'noura';
+  S.verify = { question, demo: key, vals: { permit: '', id4: '', mobile: '' }, error: '' };
+  S.stick = scroll; renderLog();
+  setTimeout(() => $('#vPermit')?.focus(), 30);
+}
+function submitVerify() {
+  const v = S.verify; if (!v) return;
+  const permit = v.vals.permit.trim().toUpperCase(), id4 = v.vals.id4.trim(), mobile = v.vals.mobile.replace(/[\s-]/g, '');
+  if (!/^(BLD|REN|SGN|FTR|EVT)-\d{5}$/.test(permit) || !/^\d{4}$/.test(id4) || !/^(\+?966|0)?5\d{8}$/.test(mobile)) {
+    v.error = 'Check the format: a permit like SGN-40220, exactly 4 digits, and a Saudi mobile like 0501234567.';
+    renderLog(); return;
+  }
+  const text = (v.question ? v.question + '\n\n' : '') + `${ID_MARK}Permit ${permit} · national ID ends ${id4} · registered mobile ${mobile}`;
+  S.verify = null;
+  send(text);
+}
+function useStarter(s) {
+  const verified = S.msgs.some((m) => m.role === 'user' && m.text.includes(ID_MARK));
+  if (s.needsId && !verified) {  // show the question in the chat, then the identity card under it; both go to Rafeeq together
+    S.msgs = S.msgs.filter((m) => !m.pending);
+    S.msgs.push({ role: 'user', text: s.text, pending: true });
+    openVerify(s.text, true, s.demo);
+  } else send(s.text);
+}
+function closeVerify() {  // "Not now": a question waiting on the card is sent on its own
+  const q = S.msgs.find((m) => m.pending);
+  S.verify = null;
+  if (q) send(q.text); else renderLog();
+}
+const lastStatus = new Map();
+async function refreshActions() {
+  if (S.stage !== 'chat' || !S.session) return;
+  try {
+    const data = await api(`/v1/chat/${encodeURIComponent(S.session)}`);
+    const changed = data.actions.length !== S.actions.length || data.actions.some((a) => lastStatus.get(a.id) !== a.status);
+    if (!changed) return;  // re-rendering would also reset a form the person is typing in
+    for (const a of data.actions) {  // a finance decision made in the Officer view shows up in the chat
+      const before = lastStatus.get(a.id);
+      if (before === 'finance_pending' && (a.status === 'finance_approved' || a.status === 'finance_rejected')) {
+        const r = a.result || {};
+        S.msgs.push({ role: 'event', finance: true, text: a.status === 'finance_approved'
+          ? `A finance officer approved ${r.refund_id || 'your refund'} (${sar(r.amount_sar || 0)}). It is paid to the original payment method within 10 working days (POL-06).`
+          : `A finance officer declined ${r.refund_id || 'your refund'}. Contact Madar on 199-00 for details.` });
+        S.stick = true;
+      }
+      lastStatus.set(a.id, a.status);
+    }
+    upsertActions(data.actions);
+    renderLog();
+  } catch {}
+}
+async function loadSession() {
+  const id = S.session;
+  if (!id) return false;
+  try {
+    const data = await api(`/v1/chat/${encodeURIComponent(id)}`);
+    if (!data.messages.length) return false;
+    S.permit = permitById(store.get('rafeeq.permit.' + id, 'any'));
+    S.actions = data.actions; data.actions.forEach((a) => lastStatus.set(a.id, a.status));
+    S.msgs = data.messages.map((m) => m.role === 'user' ? { role: 'user', text: m.text } : m.role === 'event' ? { role: 'event', text: m.text } : { role: 'bot', text: m.text });
+    const open = data.actions.filter((a) => a.status === 'awaiting').map((a) => a.id);
+    if (open.length) S.msgs.push({ role: 'bot', text: '', confirmations: open });
+    S.suggest = suggestions(); S.stick = true;
+    showChat();
+    return true;
+  } catch { return false; }
+}
+
+/* ---------------------------------------------------------------- officer */
+async function refreshOfficer() {
+  try {
+    const [queue, decided, esc_] = await Promise.all([api('/v1/officer/refunds', { role: 'officer' }),
+      api('/v1/officer/decided', { role: 'officer' }), api('/v1/officer/escalations', { role: 'officer' })]);
+    S.off = { queue, decided, esc: esc_, error: '' };
+  } catch (e) { S.off.error = e.status === 401 ? 'key' : 'offline'; }
+  renderCount();
+  if (S.view === 'officer') renderOfficer();
+}
+const REASON = { rejected: 'Application rejected', withdrawn_before_review: 'Withdrawn before review',
+  withdrawn_during_review: 'Withdrawn during review', duplicate_payment: 'Duplicate payment' };
+function renderOfficer() {
+  const q = S.off.queue, total = q.reduce((s, r) => s + r.amount_sar, 0);
+  $('#qCount').textContent = q.length;
+  $('#figures').innerHTML = [[q.length, 'waiting'], [sar(total), 'to approve'], [S.off.decided.length, 'decided']]
+    .map(([b, s]) => `<div class="fig"><div class="in"><b>${b}</b><span>${s}</span></div></div>`).join('');
+  if (S.off.error) {
+    $('#queue').innerHTML = `<div class="empty">${S.off.error === 'key' ? 'The officer key was not accepted. Open Settings (the gear) and check it.' : 'The service is offline.'}</div>`;
+    return;
+  }
+  $('#queue').innerHTML = q.length ? q.map((r) => `<article class="refund"><div class="in">
+      <div class="rid">${esc(r.refund_id)} · ${esc(r.permit_id)}</div>
+      <div class="amount">${Number(r.amount_sar).toLocaleString('en-US')}<small>SAR</small></div>
+      <div class="why">${esc(REASON[r.reason] || r.reason)}</div></div>
+      <div class="actions"><button class="btn primary small" data-act="approve" data-r="${esc(r.refund_id)}">Approve</button>
+        <button class="btn plain small" data-act="reject" data-r="${esc(r.refund_id)}">Reject</button></div></article>`).join('')
+    : '<div class="empty">No refunds waiting</div>';
+  $('#decided').innerHTML = S.off.decided.length ? S.off.decided.map((d) => `<li><span><b>${esc(d.refund_id)}</b>
+      <span class="sm">${sar(d.amount_sar)} · ${esc(d.permit_id)}</span></span>
+      <span class="badge ${d.status === 'approved' ? 'ok' : ''}">${d.status === 'approved' ? 'Approved' : 'Rejected'}</span></li>`).join('')
+    : '<li class="none">No decisions yet</li>';
+  $('#escs').innerHTML = S.off.esc.length ? S.off.esc.map((e) => `<li><span><b>${esc(e.escalation_id)}</b>
+      <span class="sm">${esc(e.permit_id)} · ${esc(e.days_overdue)} days overdue</span><span class="sm clip" dir="auto">${esc(e.note)}</span></span>
+      <span class="badge warn">Open</span></li>`).join('')
+    : '<li class="none">No escalations</li>';
+}
+async function decideRefund(id, approve, btn) {
+  btn.closest('.actions').querySelectorAll('button').forEach((b) => (b.disabled = true));
+  try {
+    const out = await api(`/v1/officer/refunds/${encodeURIComponent(id)}/${approve ? 'approve' : 'reject'}`, { method: 'POST', role: 'officer' });
+    toast(`${out.refund_id}: ${out.status}. ${out.note}`);
+  } catch (e) { toast(`${id}: ${e.message}`); }
+  refreshOfficer();
+}
+
+/* ---------------------------------------------------------------- events */
+document.addEventListener('click', (e) => {
+  const el = e.target.closest('[data-act]'); if (!el) return;
+  const a = el.dataset.act;
+  if (a === 'permit') startChat(el.dataset.id);
+  else if (a === 'starter') useStarter(S.permit.starters[Number(el.dataset.i)]);
+  else if (a === 'chip') { const t = S.suggest[Number(el.dataset.i)]; const s = S.permit.starters.find((x) => x.text === t); s ? useStarter(s) : send(t); }
+  else if (a === 'confirm') decide(Number(el.dataset.a), true);
+  else if (a === 'cancel') decide(Number(el.dataset.a), false);
+  else if (a === 'verify') submitVerify();
+  else if (a === 'demofill' && S.verify) { const d = DEMO[S.verify.demo] || DEMO.noura; S.verify.vals = { permit: d.permit, id4: d.id4, mobile: d.mobile }; S.verify.error = ''; renderLog(); }
+  else if (a === 'closeverify') closeVerify();
+  else if (a === 'goofficer') setView('officer');
+  else if (a === 'approve') decideRefund(el.dataset.r, true, el);
+  else if (a === 'reject') decideRefund(el.dataset.r, false, el);
+});
+document.addEventListener('input', (e) => { const f = e.target.dataset?.vf; if (f && S.verify) S.verify.vals[f] = e.target.value; });
+document.addEventListener('keydown', (e) => { if (e.target.dataset?.vf && e.key === 'Enter') { e.preventDefault(); submitVerify(); } });
+const input = $('#input');
+input.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); doSend(); } });
+input.addEventListener('input', () => { input.style.height = 'auto'; input.style.height = Math.min(input.scrollHeight, 140) + 'px'; });
+function doSend() { const v = input.value; if (!v.trim()) return; if (S.busy) { toast('Rafeeq is still replying. Try again in a moment.'); return; } input.value = ''; input.style.height = 'auto'; send(v); }
+$('#send').addEventListener('click', doSend);
+$('#log').addEventListener('scroll', onLogScroll);
+$('#toBottom').addEventListener('click', () => { const l = $('#log'); l.scrollTop = l.scrollHeight; });
+$('#newConv').addEventListener('click', () => startChat(S.permit.id));
+$('#changePermit').addEventListener('click', showLanding);
+$('#verifyBtn').addEventListener('click', () => openVerify(''));
+$('#askAny').addEventListener('click', () => startChat('any'));
+$('#reqToggle').addEventListener('click', () => { const s = $('#side'); s.classList.toggle('open'); $('#reqToggle').setAttribute('aria-expanded', s.classList.contains('open')); renderReqs(); });
+$('#btnApplicant').addEventListener('click', () => setView('applicant'));
+$('#btnOfficer').addEventListener('click', () => setView('officer'));
+$('#settingsBtn').addEventListener('click', () => { const s = $('#settings'); s.hidden = !s.hidden; $('#settingsBtn').setAttribute('aria-expanded', String(!s.hidden)); });
+$('#apiKey').value = S.keys.api; $('#officerKey').value = S.keys.officer;
+$('#apiKey').addEventListener('change', (e) => { S.keys.api = e.target.value.trim(); store.set('rafeeq.key', S.keys.api); refreshActions(); });
+$('#officerKey').addEventListener('change', (e) => { S.keys.officer = e.target.value.trim(); store.set('rafeeq.officerKey', S.keys.officer); refreshOfficer(); });
+window.addEventListener('hashchange', () => { const h = location.hash.slice(1); if ((h === 'applicant' || h === 'officer') && h !== S.view) setView(h, true); });
+
+/* ---------------------------------------------------------------- start */
+const params = new URLSearchParams(location.search);  // ?session=<id>&permit=SGN opens a given conversation
+const linked = (params.get('session') || '').replace(/[^\w.-]/g, '').slice(0, 64);
+if (linked) {
+  S.session = linked; store.set('rafeeq.session', linked);
+  if (params.get('permit')) store.set('rafeeq.permit.' + linked, params.get('permit').toUpperCase());
+}
+renderLanding();
+fetch('/healthz').then((r) => r.json()).then((h) => { $('#health').textContent = `online · ${h.model} · config ${h.config}`; })
+  .catch(() => { $('#health').textContent = 'service offline'; });
+setView(location.hash.slice(1) === 'officer' ? 'officer' : 'applicant', true);
+loadSession().then((restored) => {
+  const permit = (params.get('permit') || '').toUpperCase();
+  if (!restored && permit) {  // ?permit=SGN opens that permit's chat (a handy demo link)
+    if (!linked) { S.session = newSession(); store.set('rafeeq.session', S.session); }
+    S.permit = permitById(permit); store.set('rafeeq.permit.' + S.session, S.permit.id);
+    showChat();
+  }
+  if (S.stage === 'chat' && params.get('verify') === '1') openVerify('', true);  // ?verify=1 opens the identity form
+});
+refreshOfficer();
+setInterval(() => {  // the officer queue (and the header count) and the applicant's finance statuses stay live
+  if (document.hidden) return;
+  refreshOfficer();
+  if (S.stage === 'chat' && S.actions.some((a) => a.status === 'finance_pending')) refreshActions();
+}, 3500);
+})();
+</script>
+</body>
+</html>
