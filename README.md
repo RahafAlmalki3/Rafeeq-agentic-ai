@@ -9,16 +9,17 @@
 Rafeeq (رفيق) is a bilingual Arabic/English agentic AI service for Madar Municipal Services, a fictional
 municipality that issues building, renovation, signage, food-truck and event permits.
 
-> Capstone project of the **Agentic AI Systems Engineering** course by
-> [SDAIA Academy](https://github.com/SDAIAAcademy) · [Course page](https://sdaiaacademy.github.io/agentic-ai/)
->
+This project was developed as the capstone of the
+**[Agentic AI Systems Engineering](https://sdaiaacademy.github.io/agentic-ai/)** course by
+[SDAIA Academy](https://github.com/SDAIAAcademy).
+
 > This is a learner project and does not claim institutional endorsement, approval or ownership. Madar Municipal
 > Services is fictional, and all data is synthetic.
 
-## Problem statement
+## Problem Statement
 
 Applying for a municipal permit means many questions: What is the fee? What is missing from my application? When
-can my inspection be booked? Am I eligible for a refund? Today these go through a busy service desk, and a generic
+can my inspection be booked? Am I eligible for a refund? These usually go through a busy service desk, and a generic
 chatbot cannot be trusted with them, because it may guess fees, reveal another person's application, or act without
 permission.
 
@@ -57,7 +58,7 @@ answer or a proposed action. Nothing is carried out without the right person's a
 | Fallback 1 | Nemotron 3 Ultra | `nvidia/nemotron-3-ultra-550b-a55b:free` |
 | Fallback 2 | dots.3 | `dots-studio/dots-3-note-preview:free` |
 
-## Live demo
+## Live Demo
 
 > **Note:** this is a demo, not the final product. The web app lets one person play both roles, the applicant and the
 > finance officer, to see each point of view. The identity details are filled in with ready-made synthetic applicants
@@ -66,7 +67,7 @@ answer or a proposed action. Nothing is carried out without the right person's a
 <!-- Video goes here. On GitHub: edit this file in the browser and drag the .mp4 onto this line (up to 10 MB);
      GitHub uploads it and inserts the link. Or link a hosted video: [![Watch the demo](thumbnail.png)](VIDEO_URL) -->
 
-## How to run
+## How to Run
 
 ### Setup
 
@@ -78,7 +79,7 @@ cp .env.example .env        # paste OPENROUTER_API_KEY (no quotes)
 uv sync                     # installs the `rafeeq` command
 ```
 
-### Web app
+### Web App
 
 On Windows, double-click `capstone/run.bat`. Or:
 
@@ -86,17 +87,16 @@ On Windows, double-click `capstone/run.bat`. Or:
 uv run rafeeq serve         # then open http://127.0.0.1:8793/
 ```
 
-One page with an **Applicant** view (choose a permit type, chat, confirm actions) and an **Officer** view (approve or
-reject refunds).
+The app has two views: **Applicant** and **Officer**.
 
-### Command line
+### Command Line
 
 ```bash
 uv run rafeeq ask "What is the fee for an illuminated 3 m² sign?"
 uv run rafeeq chat --session sara
 ```
 
-### Tests and evaluation
+### Tests and Evaluation
 
 ```bash
 uv run pytest                                               # offline tests, no API key needed
@@ -104,7 +104,7 @@ uv run rafeeq eval --config A B                             # the eval suite on 
 uv run rafeeq redteam --config naive prompt-only defended   # the red-team suite
 ```
 
-## Design across the ladder
+## Design Across the Ladder
 
 | Rung | What Rafeeq does | Why |
 |---|---|---|
@@ -114,7 +114,7 @@ uv run rafeeq redteam --config naive prompt-only defended   # the red-team suite
 
 ## Tools and Integrations
 
-### Agent tools
+### Agent Tools
 
 | Tool | Read / write | Where | Approval? | Trifecta leg (private / untrusted / egress) |
 |---|---|---|---|---|
@@ -157,7 +157,7 @@ Rafeeq runs as a **FastAPI** service ([src/rafeeq/api.py](capstone/src/rafeeq/ap
 
 ## Evaluation and Error Analysis
 
-### Test suite
+### Test Suite
 
 - **Tasks:** 22 in [evals/tasks.jsonl](capstone/evals/tasks.jsonl), in Arabic and English
 - **Covers:** fees, rules, application status, privacy, actions, security, scope and memory
@@ -182,21 +182,29 @@ Everything else is identical, so any difference comes from the skills.
 | A | | | | |
 | B | | | | |
 
-### Error analysis
+### Error Analysis
 
 | Failure | Root cause | Fix |
 |---|---|---|
 | | | |
 
-## Security note
+## Security Note
 
-- **Trifecta:**
+- **Trifecta:** all three legs exist: private data (application records), untrusted input (the user's message,
+  which may contain a pasted email) and a way out (email).
 - **Attack tried:**
-- **Defence:**
-- **Residual risk:**
-- **Governance (PDPL / SDAIA AI principles):**
+- **Defence:** the email tool has no recipient field, so it can only write to the verified applicant. A guard
+  blocks emails containing ID numbers, mobile numbers or outside links. The applicant confirms every action. Unknown
+  permits and wrong details get the same reply, so permit IDs can't be probed.
+- **Residual risk:** the defences stop Rafeeq from *doing* harmful things, but not from *saying* wrong things.
+  - **Protected:** a trick message can't make Rafeeq send data to a stranger or act without approval.
+  - **Not fully protected:** a trick message could still make Rafeeq write something false, like "your application is
+    approved" when it isn't. Nothing changes, but the applicant might believe it.
+- **Governance (PDPL / SDAIA AI principles):** memory keeps preferences only, the audit log is redacted, and a
+  person approves every action. Data goes to a model provider outside the Kingdom, which is fine for synthetic data;
+  production would need an in-Kingdom model.
 
-## Project structure
+## Project Structure
 
 ```
 .
@@ -222,6 +230,16 @@ Everything else is identical, so any difference comes from the skills.
     └── tests/             offline tests
 ```
 
-## Limitations and next steps
+## Limitations and Next Steps
 
-- 
+**Limitations**
+- **Free models:** the daily request limit and rate limits make answers slower or unavailable at busy times, and
+  limit how many evaluation runs fit in a day.
+- **Demo identity:** applicants verify with ID digits and a mobile number typed into the chat, not a real login.
+- **Data leaves the Kingdom:** prompts go through OpenRouter to the model providers (Google, NVIDIA and dots), outside
+  Saudi Arabia, which is fine only because the data is synthetic.
+
+**Next Steps**
+- **Production setup:** a real database instead of resetting on restart, and support for many users at once.
+- **Wider security testing:** extend the red-team suite, which focuses on data leaks by email, to attacks that trick
+  Rafeeq into giving false answers, and check its replies against Madar's records before they are sent.
