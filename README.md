@@ -68,9 +68,13 @@ answer or a proposed action. Nothing is carried out without the right person's a
 > finance officer, to see each point of view.
 > The identity details are filled in with ready-made synthetic applicants
 > ("Fill demo details") so the full flow can be shown quickly, instead of a real person entering their own data.
+https://github.com/user-attachments/assets/457e0442-a118-4b82-a691-9f8f71da9e16
 
-<!-- Video goes here. On GitHub: edit this file in the browser and drag the .mp4 onto this line (up to 10 MB);
-     GitHub uploads it and inserts the link. Or link a hosted video: [![Watch the demo](thumbnail.png)](VIDEO_URL) -->
+
+
+
+
+
 
 ## How to Run
 
