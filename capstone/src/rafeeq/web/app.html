@@ -159,10 +159,6 @@ main{max-width:1180px;margin:0 auto;padding:clamp(16px,3vw,32px)}
 .vrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:12px 6px 6px}
 .verr{margin-top:10px;color:var(--bad);font-size:13.5px}
 
-.suggest{display:flex;gap:8px;flex-wrap:wrap;padding:0 clamp(12px,2.5vw,24px)}
-.suggest:not(:empty){padding-top:6px}
-.chip{padding:7px 15px;border-radius:999px;background:var(--soft);font-size:14px;font-weight:500;text-align:start}
-.chip:hover{background:var(--violet-soft)}
 .composer{display:flex;gap:8px;align-items:flex-end;margin:10px clamp(12px,2.5vw,20px) 14px;padding:5px 5px 5px 18px;border-radius:28px;background:var(--soft)}
 .composer:focus-within{box-shadow:inset 0 0 0 2px var(--violet-soft)}
 .composer textarea{flex:1;resize:none;max-height:140px;padding:9px 0;border:0;background:transparent;line-height:1.5;outline:none}
@@ -225,8 +221,6 @@ main{max-width:1180px;margin:0 auto;padding:clamp(16px,3vw,32px)}
 @media (max-width:560px){
   .permit-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
   .permit .ico{width:64px;height:64px}
-  .suggest{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
-  .suggest .chip{flex:none;max-width:80vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .vgrid{grid-template-columns:1fr}
   .stack{max-width:92%}
   .role{padding:6px 12px}
@@ -286,7 +280,6 @@ main{max-width:1180px;margin:0 auto;padding:clamp(16px,3vw,32px)}
           <button class="to-bottom" id="toBottom" aria-label="Jump to the latest message" hidden>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M6 13l6 6 6-6"/></svg>
           </button>
-          <div class="suggest" id="suggest"></div>
           <div class="composer">
             <textarea id="input" rows="1" dir="auto" placeholder="Type your message…  اكتب رسالتك" aria-label="Your message"></textarea>
             <button class="btn primary send" id="send">Send</button>
@@ -577,12 +570,7 @@ function renderLog() {
   log.innerHTML = body || welcomeHTML();
   if (body && (pinned || S.stick)) { log.style.scrollBehavior = 'auto'; log.scrollTop = log.scrollHeight; log.style.scrollBehavior = ''; }
   S.stick = false;
-  onLogScroll(); renderSuggest(); renderReqs();
-}
-function renderSuggest() {  // hidden while Rafeeq replies, the identity card is open, or an action awaits Confirm
-  const show = S.msgs.length && !S.busy && !S.verify && !S.actions.some((a) => a.status === 'awaiting');
-  $('#suggest').innerHTML = show
-    ? suggestions().map((t) => `<button class="chip" data-act="chip" data-t="${esc(t)}" dir="auto">${esc(t)}</button>`).join('') : '';
+  onLogScroll(); renderReqs();
 }
 function resultLine(r) {
   if (!r || typeof r !== 'object') return [];
@@ -602,7 +590,7 @@ function renderReqs() {
     return `<div class="req"><b>${esc(a.action)}</b><span class="badge ${st[1]}">${esc(st[0])}</span>${resHTML}${go}</div>`;
   }).join('');
 }
-function updateComposer() { $('#send').disabled = S.busy; $('#verifyBtn').disabled = S.busy; renderSuggest(); }
+function updateComposer() { $('#send').disabled = S.busy; $('#verifyBtn').disabled = S.busy; }
 function onLogScroll() { const l = $('#log'); $('#toBottom').hidden = !(S.msgs.length && l.scrollHeight - l.scrollTop - l.clientHeight > 260); }
 
 /* ---------------------------------------------------------------- chat engine */
@@ -611,12 +599,6 @@ function upsertActions(list) {
     const i = S.actions.findIndex((x) => x.id === a.id);
     if (i >= 0) S.actions[i] = { ...S.actions[i], ...a }; else S.actions.push(a);
   }
-}
-function suggestions() {
-  const asked = new Set(S.msgs.filter((m) => m.role === 'user').map((m) => splitIdentity(m.text).question));
-  const list = S.permit.starters.filter((s) => !asked.has(s.text)).map((s) => s.text).slice(0, 2);
-  if (S.msgs.some((m) => m.role === 'user' && m.text.includes(ID_MARK)) && !asked.has('Email me a short summary of this.')) list.push('Email me a short summary of this.');
-  return list;
 }
 let typingTimer;
 function startTyping(text) {
@@ -785,7 +767,6 @@ document.addEventListener('click', (e) => {
   const a = el.dataset.act;
   if (a === 'permit') startChat(el.dataset.id);
   else if (a === 'starter') useStarter(S.permit.starters[Number(el.dataset.i)]);
-  else if (a === 'chip') { const s = S.permit.starters.find((x) => x.text === el.dataset.t); s ? useStarter(s) : send(el.dataset.t); }
   else if (a === 'confirm') decide(Number(el.dataset.a), true);
   else if (a === 'cancel') decide(Number(el.dataset.a), false);
   else if (a === 'verify') submitVerify();

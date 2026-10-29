@@ -1,7 +1,5 @@
 # Rafeeq - Advanced Agentic AI Systems Engineering
 
-**By [Rahaf Almalki](https://github.com/RahafAlmalki3)**
-
 ![Python](https://img.shields.io/badge/Python-3.11+-3776AB?logo=python&logoColor=white)
 ![FastAPI](https://img.shields.io/badge/FastAPI-009688?logo=fastapi&logoColor=white)
 ![MCP](https://img.shields.io/badge/MCP-Model_Context_Protocol-000000?logo=anthropic&logoColor=white)
@@ -15,7 +13,9 @@ Developed as a capstone project for the **Agentic AI Systems Engineering** cours
 - [Agentic AI Systems Engineering Course](https://sdaiaacademy.github.io/agentic-ai/)
 - [Agentic AI Systems Engineering Repository](https://github.com/SDAIAAcademy/agentic-ai)
 
-> [!IMPORTANT]
+**Author:** [Rahaf Almalki](https://github.com/RahafAlmalki3)
+
+> [!NOTE]
 > This is a learner project and does not claim institutional endorsement, approval or ownership. Madar Municipal
 > Services is fictional, and all data is synthetic.
 
