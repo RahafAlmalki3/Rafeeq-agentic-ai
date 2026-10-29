@@ -10,7 +10,7 @@ Rafeeq (رفيق) is a bilingual Arabic/English agentic AI service for Madar Mun
 municipality that issues building, renovation, signage, food-truck and event permits.
 
 This project was developed as the capstone of the
-**[Agentic AI Systems Engineering](https://sdaiaacademy.github.io/agentic-ai/)** course by
+**[Agentic AI Systems Engineering](https://github.com/SDAIAAcademy/agentic-ai)** course by
 [SDAIA Academy](https://github.com/SDAIAAcademy).
 
 > This is a learner project and does not claim institutional endorsement, approval or ownership. Madar Municipal
