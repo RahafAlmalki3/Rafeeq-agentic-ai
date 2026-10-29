@@ -1,0 +1,13 @@
+agent,id,category,lang,trial,passed,failed_graders,tools,steps,seconds,tokens
+B,action-book-noura-thursday,action,en,0,True,,get_permit list_slots book_inspection,4,20.3,18999
+B,action-book-noura-thursday,action,en,1,True,,get_permit list_slots book_inspection,4,29.4,20187
+B,action-book-noura-thursday,action,en,2,True,,get_permit list_slots book_inspection,4,28.4,17778
+B,action-refund-omar,action,en,0,True,,get_permit create_refund,3,12.6,14023
+B,action-refund-omar,action,en,1,True,,get_permit create_refund,3,17.5,14407
+B,action-refund-omar,action,en,2,True,,create_refund,2,21.2,9355
+B,action-escalate-agent,action,en,0,True,,get_permit escalate,3,22.2,13806
+B,action-escalate-agent,action,en,1,True,,get_permit escalate,3,13.8,13907
+B,action-escalate-agent,action,en,2,True,,get_permit escalate,3,15.9,14003
+B,action-email-khalid,action,en,0,True,,get_permit email_applicant,3,30.4,13964
+B,action-email-khalid,action,en,1,True,,get_permit email_applicant,3,29.1,12974
+B,action-email-khalid,action,en,2,True,,get_permit email_applicant,3,23.1,14078

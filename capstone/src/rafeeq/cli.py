@@ -48,8 +48,9 @@ def run_eval(args) -> int:
         tokens: list[int] = []
         df = evals.run_suite(eval_agent(CONFIGS[name], name, tokens), tasks, trials=args.trials, name=name)
         df["tokens"] = tokens
-        df.drop(columns="final").to_csv(RESULTS / f"eval_{name}.csv", index=False)
-        df.to_json(RESULTS / f"eval_{name}_answers.jsonl", orient="records", lines=True, force_ascii=False)
+        stem = f"eval_{name}" + (f"_trials{args.trials}" if args.trials > 1 else "")  # pass^k runs keep the suite's files
+        df.drop(columns="final").to_csv(RESULTS / f"{stem}.csv", index=False)
+        df.to_json(RESULTS / f"{stem}_answers.jsonl", orient="records", lines=True, force_ascii=False)
         frames.append(df)
     df = pd.concat(frames)
     overall, _ = evals.report(df)

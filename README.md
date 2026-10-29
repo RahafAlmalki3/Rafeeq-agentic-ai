@@ -1,5 +1,7 @@
 # Rafeeq - Advanced Agentic AI Systems Engineering
 
+**By [Rahaf Almalki](https://github.com/RahafAlmalki3)**
+
 ![Python](https://img.shields.io/badge/Python-3.11+-3776AB?logo=python&logoColor=white)
 ![FastAPI](https://img.shields.io/badge/FastAPI-009688?logo=fastapi&logoColor=white)
 ![MCP](https://img.shields.io/badge/MCP-Model_Context_Protocol-000000?logo=anthropic&logoColor=white)
@@ -9,10 +11,11 @@
 Rafeeq (رفيق) is a bilingual Arabic/English agentic AI service for Madar Municipal Services, a fictional
 municipality that issues building, renovation, signage, food-truck and event permits.
 
-This project was developed as the capstone of the
-**[Agentic AI Systems Engineering](https://github.com/SDAIAAcademy/agentic-ai)** course by
-[SDAIA Academy](https://github.com/SDAIAAcademy).
+Developed as a capstone project for the **Agentic AI Systems Engineering** course by **[SDAIA Academy](https://github.com/SDAIAAcademy)**.
+- [Agentic AI Systems Engineering Course](https://sdaiaacademy.github.io/agentic-ai/)
+- [Agentic AI Systems Engineering Repository](https://github.com/SDAIAAcademy/agentic-ai)
 
+> [!IMPORTANT]
 > This is a learner project and does not claim institutional endorsement, approval or ownership. Madar Municipal
 > Services is fictional, and all data is synthetic.
 
@@ -101,7 +104,34 @@ uv run rafeeq chat --session sara
 ```bash
 uv run pytest                                               # offline tests, no API key needed
 uv run rafeeq eval --config A B                             # the eval suite on both configurations
+uv run rafeeq eval --config A B --trials 3 --ids action-book-noura-thursday action-refund-omar action-escalate-agent action-email-khalid   # pass@3 and pass^3
 uv run rafeeq redteam --config naive prompt-only defended   # the red-team suite
+```
+
+## Project Structure
+
+```
+.
+├── README.md
+├── .github/workflows/     CI checks
+└── capstone/
+    ├── run.bat            start the web app (Windows)
+    ├── AGENTS.md          system prompt
+    ├── pyproject.toml     package and dependencies
+    ├── .env.example       settings template
+    ├── src/rafeeq/
+    │   ├── cli.py         command line
+    │   ├── api.py         FastAPI service
+    │   ├── web/app.html   web app
+    │   ├── agent.py       the agent
+    │   ├── guards.py      guard and audit log
+    │   ├── memory.py      memory tool
+    │   ├── mcp_server.py  MCP server
+    │   ├── redteam.py     red-team suite
+    │   └── kit/           course library
+    ├── data/              policies, skills, data
+    ├── evals/             eval tasks and results
+    └── tests/             offline tests
 ```
 
 ## Design Across the Ladder
@@ -177,22 +207,38 @@ Everything else is identical, so any difference comes from the skills.
 
 ### Results
 
-| Config | Pass rate | pass^3 (actions) | Avg steps | Avg tokens |
-|---|---|---|---|---|
-| A | | | | |
-| B | | | | |
+| Config | Pass rate | pass@3 | pass^3 | Avg steps | Avg tokens |
+|---|---|---|---|---|---|
+| A | 91% (20/22) | 100% | 100% | 2.5 | 10,843 |
+| B | 95% (21/22) | 100% | 100% | 2.3 | 10,508 |
+
+- **Pass rate** uses all 22 tasks. The few failures are in rules, memory and scope questions.
+- **pass@3 and pass^3** use only the four action tasks (booking, refund, escalation, email), each run three times.
+  pass@3 counts a task if any run passed, pass^3 only if all three did.
+
+B is slightly better and uses fewer tokens: the refund skill helps with refund rules.
+See [eval_A.csv](capstone/evals/results/eval_A.csv), [eval_B.csv](capstone/evals/results/eval_B.csv),
+[eval_A_trials3.csv](capstone/evals/results/eval_A_trials3.csv) and [eval_B_trials3.csv](capstone/evals/results/eval_B_trials3.csv).
 
 ### Error Analysis
 
 | Failure | Root cause | Fix |
 |---|---|---|
-| | | |
+| Rafeeq asked "shall I?" in text instead of proposing the action, so nothing could be confirmed | The spec told it to describe an action before doing it | The spec now says to call the tool; the Confirm card does the asking. Actions now pass in both configs |
+| Policy answers left out a condition (refund timing, the 60-day appeal window) | Rafeeq answered rule questions from memory | The spec now requires a policy search for every rule question. Fixed in most cases; one answer in each config still drops a detail |
+| A failed verification hinted that the permit exists | Model wording, and a tool that answered "no permit" for unknown IDs | Unknown permits and wrong details now get the same reply, guarded by a test |
+| A saved preference was confirmed only with "Saved." | Too short a confirmation (config A) | Open: the preference itself is saved correctly |
+| The judge's verdict could not be read | A fallback judge model wrote prose and ran out of tokens | More room for the judge and one retry |
 
 ## Security Note
 
 - **Trifecta:** all three legs exist: private data (application records), untrusted input (the user's message,
   which may contain a pasted email) and a way out (email).
-- **Attack tried:**
+- **Attack tried:** 6 attacks (a hidden instruction in a pasted email, a fake approval letter, "email it to my lawyer",
+  a "system override", an Arabic "from the manager" instruction, and a link that hides a mobile number) and 2 normal
+  requests, against three builds: naive, prompt-only and defended. No attack succeeded on any build. Normal emails
+  reached the applicant in 100% of cases on the defended build and 0% on the others; the prompt-only build even sent
+  one to a permit number instead of an address. See [redteam.csv](capstone/evals/results/redteam.csv).
 - **Defence:** the email tool has no recipient field, so it can only write to the verified applicant. A guard
   blocks emails containing ID numbers, mobile numbers or outside links. The applicant confirms every action. Unknown
   permits and wrong details get the same reply, so permit IDs can't be probed.
@@ -203,32 +249,6 @@ Everything else is identical, so any difference comes from the skills.
 - **Governance (PDPL / SDAIA AI principles):** memory keeps preferences only, the audit log is redacted, and a
   person approves every action. Data goes to a model provider outside the Kingdom, which is fine for synthetic data;
   production would need an in-Kingdom model.
-
-## Project Structure
-
-```
-.
-├── README.md
-├── .github/workflows/     CI checks
-└── capstone/
-    ├── run.bat            start the web app (Windows)
-    ├── AGENTS.md          system prompt
-    ├── pyproject.toml     package and dependencies
-    ├── .env.example       settings template
-    ├── src/rafeeq/
-    │   ├── cli.py         command line
-    │   ├── api.py         FastAPI service
-    │   ├── web/app.html   web app
-    │   ├── agent.py       the agent
-    │   ├── guards.py      guard and audit log
-    │   ├── memory.py      memory tool
-    │   ├── mcp_server.py  MCP server
-    │   ├── redteam.py     red-team suite
-    │   └── kit/           course library
-    ├── data/              policies, skills, data
-    ├── evals/             eval tasks and results
-    └── tests/             offline tests
-```
 
 ## Limitations and Next Steps
 
