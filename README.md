@@ -63,8 +63,10 @@ answer or a proposed action. Nothing is carried out without the right person's a
 
 ## Live Demo
 
-> **Note:** this is a demo, not the final product. The web app lets one person play both roles, the applicant and the
-> finance officer, to see each point of view. The identity details are filled in with ready-made synthetic applicants
+> [!IMPORTANT]
+> This is a demo, not the final product. The web app lets one person play both roles, the applicant and the
+> finance officer, to see each point of view.
+> The identity details are filled in with ready-made synthetic applicants
 > ("Fill demo details") so the full flow can be shown quickly, instead of a real person entering their own data.
 
 <!-- Video goes here. On GitHub: edit this file in the browser and drag the .mp4 onto this line (up to 10 MB);
