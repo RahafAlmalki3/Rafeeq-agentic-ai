@@ -43,7 +43,6 @@ svg{display:block}
 .brand small{display:block;font-size:12px;color:var(--muted);line-height:1.25}
 .demo-note{margin:28px auto 0;max-width:720px;padding:10px 22px;border-radius:24px;background:var(--surface);color:var(--muted);font-size:13px;text-align:center}
 .demo-note b{color:var(--indigo)}
-.logo{width:38px;height:38px;border-radius:50%;background:var(--indigo);color:var(--cream);display:grid;place-items:center;font-size:20px;font-weight:700;flex:none}
 .top-right{display:flex;align-items:center;gap:8px}
 .roles{display:flex;padding:4px;border-radius:999px;background:var(--surface);box-shadow:var(--shadow-sm);gap:2px}
 .role{padding:6px 16px;border-radius:999px;font-weight:600;color:var(--muted);display:flex;align-items:center;gap:8px;transition:background .2s,color .2s}
@@ -240,8 +239,7 @@ main{max-width:1180px;margin:0 auto;padding:clamp(16px,3vw,32px)}
 
 <header class="top">
   <div class="brand">
-    <div class="logo" aria-hidden="true">ر</div>
-    <div><b>Rafeeq · رفيق</b><small>Madar Municipal Services’ permit assistant</small></div>
+    <div><b>Rafeeq · رفيق</b><small>Madar Municipal Services</small></div>
   </div>
   <div class="top-right">
     <span class="demo-tag" title="One person can play both roles on this page">DEMO</span>
@@ -267,8 +265,8 @@ main{max-width:1180px;margin:0 auto;padding:clamp(16px,3vw,32px)}
     <div id="landing">
       <div class="hero">
         <h1>Which permit do you need?<span class="ar" dir="rtl" lang="ar">أي تصريح تحتاج؟</span></h1>
-        <p>Rafeeq (<bdi lang="ar">رفيق</bdi>) is the permit assistant of Madar Municipal Services. Ask in Arabic or English;
-          nothing changes until you confirm.</p>
+        <p>Fees, inspections, refunds and more, answered in Arabic or English.<br>
+          Rafeeq handles the steps; you make the final call.</p>
       </div>
       <div class="permit-grid" id="permitGrid"></div>
       <div class="landing-foot"><button class="btn ghost" id="askAny">Not sure? Ask a question</button></div>
@@ -418,7 +416,7 @@ const MESSAGES = {
 /* ---------------------------------------------------------------- state */
 const S = {
   view: 'applicant', stage: 'landing', permit: null, session: store.get('rafeeq.session', ''),
-  msgs: [], actions: [], verify: null, busy: false, typing: '', suggest: [], stick: true,
+  msgs: [], actions: [], verify: null, busy: false, typing: '', stick: true,
   keys: { api: store.get('rafeeq.key', 'dev-key-1'), officer: store.get('rafeeq.officerKey', 'officer-key-1') },
   off: { queue: [], decided: [], esc: [], error: '' },
 };
@@ -504,7 +502,7 @@ function startChat(permitId) {
   S.session = newSession();
   store.set('rafeeq.session', S.session);
   store.set('rafeeq.permit.' + S.session, S.permit.id);
-  S.msgs = []; S.actions = []; S.verify = null; S.suggest = []; S.stick = true;
+  S.msgs = []; S.actions = []; S.verify = null; S.stick = true;
   showChat();
   setTimeout(() => $('#input').focus(), 50);
 }
@@ -581,9 +579,10 @@ function renderLog() {
   S.stick = false;
   onLogScroll(); renderSuggest(); renderReqs();
 }
-function renderSuggest() {
-  $('#suggest').innerHTML = (!S.busy && !S.verify && S.suggest.length)
-    ? S.suggest.map((t, i) => `<button class="chip" data-act="chip" data-i="${i}" dir="auto">${esc(t)}</button>`).join('') : '';
+function renderSuggest() {  // hidden while Rafeeq replies, the identity card is open, or an action awaits Confirm
+  const show = S.msgs.length && !S.busy && !S.verify && !S.actions.some((a) => a.status === 'awaiting');
+  $('#suggest').innerHTML = show
+    ? suggestions().map((t) => `<button class="chip" data-act="chip" data-t="${esc(t)}" dir="auto">${esc(t)}</button>`).join('') : '';
 }
 function resultLine(r) {
   if (!r || typeof r !== 'object') return [];
@@ -631,13 +630,12 @@ function showTurn(out) {
   if (out.reply || ids.length) S.msgs.push({ role: 'bot', text: out.reply || '', tools: [...new Set(out.tools || [])], confirmations: ids, time: now() });
   const verified = S.msgs.some((m) => m.role === 'user' && m.text.includes(ID_MARK));
   if (!ids.length && asksForIdentity(out.reply) && !verified) openVerify('', false);
-  S.suggest = suggestions();
 }
 async function send(text) {
   text = (text || '').trim();
   if (!text) return;
   if (S.busy) { toast('Rafeeq is still replying. Try again in a moment.'); return; }
-  S.busy = true; S.verify = null; S.suggest = [];
+  S.busy = true; S.verify = null;
   S.msgs = S.msgs.filter((m) => !m.pending);
   S.msgs.push({ role: 'user', text, time: now() });
   startTyping(text); S.stick = true; updateComposer(); renderLog();
@@ -729,7 +727,7 @@ async function loadSession() {
     S.msgs = data.messages.map((m) => m.role === 'user' ? { role: 'user', text: m.text } : m.role === 'event' ? { role: 'event', text: m.text } : { role: 'bot', text: m.text });
     const open = data.actions.filter((a) => a.status === 'awaiting').map((a) => a.id);
     if (open.length) S.msgs.push({ role: 'bot', text: '', confirmations: open });
-    S.suggest = suggestions(); S.stick = true;
+    S.stick = true;
     showChat();
     return true;
   } catch { return false; }
@@ -787,7 +785,7 @@ document.addEventListener('click', (e) => {
   const a = el.dataset.act;
   if (a === 'permit') startChat(el.dataset.id);
   else if (a === 'starter') useStarter(S.permit.starters[Number(el.dataset.i)]);
-  else if (a === 'chip') { const t = S.suggest[Number(el.dataset.i)]; const s = S.permit.starters.find((x) => x.text === t); s ? useStarter(s) : send(t); }
+  else if (a === 'chip') { const s = S.permit.starters.find((x) => x.text === el.dataset.t); s ? useStarter(s) : send(el.dataset.t); }
   else if (a === 'confirm') decide(Number(el.dataset.a), true);
   else if (a === 'cancel') decide(Number(el.dataset.a), false);
   else if (a === 'verify') submitVerify();
