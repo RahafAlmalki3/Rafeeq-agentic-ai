@@ -62,14 +62,13 @@ answer or a proposed action. Nothing is carried out without the right person's a
 | Fallback 2 | dots.3 | `dots-studio/dots-3-note-preview:free` |
 
 ## Live Demo
-
+https://github.com/user-attachments/assets/457e0442-a118-4b82-a691-9f8f71da9e16
 > [!IMPORTANT]
 > This is a demo, not the final product. The web app lets one person play both roles, the applicant and the
 > finance officer, to see each point of view.
 > The identity details are filled in with ready-made synthetic applicants
 > ("Fill demo details") so the full flow can be shown quickly, instead of a real person entering their own data.
 
-https://github.com/user-attachments/assets/457e0442-a118-4b82-a691-9f8f71da9e16
 
 ## How to Run
 
